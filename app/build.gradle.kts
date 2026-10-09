@@ -49,7 +49,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
 
     // Client requête Ktor
-    implementation("io.ktor:ktor-client-okhttp:3.4.2")
+    implementation("io.ktor:ktor-client-java:3.4.2")
     implementation("io.ktor:ktor-client-content-negotiation:3.4.2")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.2")
     implementation("io.ktor:ktor-client-logging-jvm:3.4.2")
