@@ -13,12 +13,20 @@ class MainViewModel : ViewModel() {
     // MutableStateFlow est une donnée observable
     val dataList = MutableStateFlow(emptyList<Weather>())
     val runInProgress = MutableStateFlow(false)
+    val errorMessage = MutableStateFlow<String?>(null)
 
-    fun loadWeathers(cityName: String) {
+    fun loadWeathers(cityName: String?) {
         runInProgress.value = true
+        errorMessage.value = null
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                if (cityName.isNullOrBlank() || cityName.length < 3) {
+                    throw IllegalArgumentException("Le nom de la ville doit contenir au moins 3 caractères")
+                }
                 dataList.value = WeatherApiDataSource.loadWeathers(cityName)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                errorMessage.value = e.message
             } finally {
                 runInProgress.value = false
             }
@@ -28,16 +36,19 @@ class MainViewModel : ViewModel() {
 
 suspend fun main() {
     val viewModel = MainViewModel()
-    viewModel.loadWeathers("Nice")
+    viewModel.loadWeathers("")
+    //viewModel.loadWeathers("Paris")
 
     while (viewModel.runInProgress.value) {
         delay(500)
     }
 
-    // Affichage de la liste (qui doit être remplie) contenue dans la donnée observable
+    // Affichage de la liste et du message d'erreur
     println("List : ${viewModel.dataList.value}")
+    println("ErrorMessage : ${viewModel.errorMessage.value}")
 
     // Pour que le programme s'arrête, inutile sur Android
     WeatherApiDataSource.close()
 }
+
 
