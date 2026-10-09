@@ -111,21 +111,18 @@ object WeatherApiDataSource {
         }
         val responseDTO = response.body<WeatherResponseDTO>()
 
-        val weatherList = ArrayList<Weather>()
-        responseDTO.list?.forEach { cityWeather ->
-            weatherList.add(
-                Weather(
-                    id = cityWeather.id ?: 0,
-                    name = cityWeather.name ?: "",
-                    temp = cityWeather.main?.temp ?: 0.0,
-                    speed = cityWeather.wind?.speed ?: 0.0,
-                    description = cityWeather.weather?.firstOrNull()?.description ?: "",
-                    icon = cityWeather.weather?.firstOrNull()?.icon ?: ""
-                )
+        return responseDTO.list?.map { cityWeather ->
+            val iconCode = cityWeather.weather?.firstOrNull()?.icon ?: ""
+            val iconUrl = if (iconCode.isNotBlank()) "https://openweathermap.org/img/wn/${iconCode}@4x.png" else ""
+            Weather(
+                id = cityWeather.id ?: 0,
+                name = cityWeather.name ?: "",
+                temp = cityWeather.main?.temp ?: 0.0,
+                speed = cityWeather.wind?.speed ?: 0.0,
+                description = cityWeather.weather?.firstOrNull()?.description ?: "",
+                icon = iconUrl
             )
-        }
-
-        return weatherList
+        } ?: emptyList()
     }
 
     fun close() = client.close()
